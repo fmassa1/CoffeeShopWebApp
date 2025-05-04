@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Barista Dashboard</title>
+    <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+<body>
+    <div class="tabbar">
+        <div class="tab-buttons">
+            {% if session.get('role') == 'manager' or session.get('role') == 'both' %}
+                <form class="tab-button-form" action="{{ url_for('manager_menu') }}" method="GET">
+                    <button type="submit">Switch to Manager Menu</button>
+                </form>
+            {% endif %}
+            <form class="tab-button-form" action="{{ url_for('logout') }}" method="POST">
+                <button type="submit">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <h1>Available Drinks</h1>
+
+<table border="1">
+    <tr>
+        <th>Drink</th>
+        <th>Price</th>
+    </tr>
+    {% for item in menu %}
+    <tr>
+        <td>{{ item[0] }}</td>
+        <td>${{ "%.2f"|format(item[1]|float) }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% if error_message %}
+    <p style="color: red; font-weight: bold;">Order Failed: {{ error_message }}</p>
+{% endif %}
+
+<h1>Create New Order</h1>
+
+<form action="{{ url_for('submit_order') }}" method="POST" id="order-form">
+    <div id="order-items">
+        <div class="order-item">
+            <label>Drink:
+                <select name="item[]">
+                    {% for item in menu %}
+                        <option value="{{ item[0] }}">{{ item[0] }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <label>Quantity:
+                <input type="number" name="quantity[]" min="1" required>
+            </label>
+        </div>
+    </div>
+
+    <button type="button" onclick="addItem()">Add Another Drink</button><br><br>
+
+    <label>Payment Method:
+        <select name="payment_method">
+            <option value="cash">Cash</option>
+            <option value="credit card">Credit Card</option>
+            <option value="app">App</option>
+        </select>
+    </label><br>
+
+    <button type="submit">Place Order</button>
+</form>
+
+<script>
+function addItem() {
+    const container = document.getElementById('order-items');
+    const itemDiv = document.createElement('div');
+    itemDiv.classList.add('order-item');
+    itemDiv.innerHTML = `
+        <label>Drink:
+            <select name="item[]">
+                {% for item in menu %}
+                    <option value="{{ item[0] }}">{{ item[0] }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>Quantity:
+            <input type="number" name="quantity[]" min="1" required>
+        </label>
+    `;
+    container.appendChild(itemDiv);
+}
+</script>
+
+{% if order_summary %}
+<h2>Order Summary</h2>
+<ul>
+    {% for item, quantity in order_summary %}
+        <li>{{ item }} — Quantity: {{ quantity }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+    {% if instructions %}
+        <h2>Preparation Instructions</h2>
+        {% for drink, steps in instructions.items() %}
+            <h3>{{ drink }}</h3>
+            <ol>
+                {% for step in steps %}
+                    <li>{{ step }}</li>
+                {% endfor %}
+            </ol>
+        {% endfor %}
+    {% endif %}
+
+<h1>Work Schedules</h1>
+    <table border="1">
+        <tr>
+            <th>SSN</th>
+            <th>Name</th>
+            <th>Day of Week</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+        </tr>
+    {% for sched in schedules %}
+         <tr>
+            <td>{{ sched[0] }}</td>
+            <td>{{ sched[1] }}</td>
+             <td>{{ sched[2] }}</td>
+            <td>{{ sched[3] }}</td>
+            <td>{{ sched[4] }}</td>
+        </tr>
+    {% endfor %}
+
+</body>
+</html>

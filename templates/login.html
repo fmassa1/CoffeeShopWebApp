@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Coffee Shop</title>
+    <link rel="stylesheet" href="/static/login_style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to Coffee Shop</h2>
+        <form action="/login" method="post">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <input type="submit" value="Login">
+        </form>
+        {% if message %}
+            <p>{{ message }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
